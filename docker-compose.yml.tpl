@@ -110,6 +110,7 @@ gandalf:
     restart: always
     ports:
     - "8001:8001"
+    - "2222:22"
     volumes:
     - /data/gandalf:/data/gandalf
     - /data/tsuru:/data/tsuru
