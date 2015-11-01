@@ -69,3 +69,6 @@ start-docker-no-tls:
 	@[[ "$$(docker-machine status docker-no-tls)" != "Running" ]] \
 		&& docker-machine start docker-no-tls \
 		|| echo docker-no-tls is running
+
+consul-keys:
+	@terraform apply -var consul_ip=$$(docker-machine ip docker-tsuru-admin)
