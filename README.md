@@ -1,20 +1,22 @@
-# Install Tsuru server
+Run a [Tsuru](http://tsuru.io/) server environment locally using [docker-machine](https://docs.docker.com/machine/).
+
+
+# Quickstart
+## Requirements
+* [Docker toolbox](https://www.docker.com/docker-toolbox)
+* [VirtualBox](https://www.virtualbox.org)
+* [Tsuru clients](http://docs.tsuru.io/en/stable/using/install-client.html)
+* [Terraform](https://terraform.io)
 
 ## Official release
+This will install 2 docker daemons:
+
+* Tsuru server from official images
+* Generic docker node ready to be added to Tsuru
+
 ```
 $ make
 ```
-
-## Development
-* Clone Tsuru dockerized setup from https://github.com/tsuru/dockerized-setup.git
-* Tweak Dockerfiles as required
-* Run:
-
-```
-$ make dev DOCKERIZED_SETUP_DIR=<directory path>
-```
-
-# Install client
 
 ## Configure tsuru client
 
@@ -57,7 +59,7 @@ $ tsuru-admin pool-add default
 $ tsuru-admin pool-teams-add default admin
 ```
 
-## Register nodes
+## Register node
 
 ```
 $ tsuru-admin docker-node-add --register address=http://192.168.99.101:2375 pool=default
@@ -82,7 +84,6 @@ $ tsuru-admin docker-node-list
 +----------------------------+---------+--------+----------------------------------+
 ```
 
-
 ## Install platform
 
 ```
@@ -96,7 +97,7 @@ Platform successfully added!
 ## Add public key
 
 ```
-$ tsuru key-add mykey  ~/.ssh/id_rsa.pub 
+$ tsuru key-add mykey ~/.ssh/id_rsa.pub 
 ```
 
 ## Git clone
@@ -110,11 +111,33 @@ $ git clone https://github.com/tsuru/tsuru-dashboard.git
 $ tsuru app-create dashboard python
 App "dashboard" has been created!
 Use app-info to check the status of the app and its units.
-Your repository for "dashboard" project is "ssh://git@gandalf.service.consul/dashboard.git"
+Your repository for "dashboard" project is "ssh://git@192.168.99.102:2222/dashboard.git"
 ```
 
 ## Deploy app
 
 ```
-$ git push ssh://git@gandalf.service.consul/dashboard.git master
+$ git push ssh://git@192.168.99.102:2222/dashboard.git master
 ```
+
+Open in a browser: http://dashboard.192.168.99.102.nip.io/
+
+# Development
+## Build images locally
+For Tsuru images development you can tweak and build images locally instead of downloading official images.
+
+* Clone Tsuru dockerized setup from https://github.com/tsuru/dockerized-setup.git
+* Tweak Dockerfiles as required
+* Run:
+
+```
+$ make dev DOCKERIZED_SETUP_DIR=<directory path>
+```
+
+## Test
+
+```
+$ make test
+```
+
+This is a basic test running the quickstart steps without error-checking.
