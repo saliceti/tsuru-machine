@@ -72,3 +72,28 @@ start-docker-no-tls:
 
 consul-keys:
 	@terraform apply -var consul_ip=$$(docker-machine ip docker-tsuru-admin)
+
+test:
+	$(eval tsuru_admin_ip=$(shell docker-machine ip docker-tsuru-admin))
+	tsuru target-remove machine-${tsuru_admin_ip}
+	tsuru target-add -s machine-${tsuru_admin_ip} http://${tsuru_admin_ip}:8000
+	curl -d "{\"email\":\"clark@dailyplanet.com\",\"password\":\"superman\"}" http://${tsuru_admin_ip}:8000/users
+	ruby login.rb ${tsuru_admin_ip}:8000 clark@dailyplanet.com superman
+	tsuru team-create admin || echo ok
+	tsuru-admin pool-add default || echo ok
+	tsuru-admin pool-teams-add default admin || echo ok
+	$(eval tsuru_docker_ip=$(shell docker-machine ip docker-no-tls))
+	tsuru-admin docker-node-add --register address=http://${tsuru_docker_ip}:2375 pool=default
+	until tsuru-admin docker-node-list | grep -q ready; do echo Waiting for docker node...; sleep 1; done
+	tsuru-admin platform-add python --dockerfile https://raw.githubusercontent.com/tsuru/basebuilder/master/python/Dockerfile || echo ok
+	tsuru key-remove test_tsuru_abcd123 -y || echo ok
+	rm -f ~/.id_rsa_test_tsuru_abcd123
+	ssh-keygen -f ~/.id_rsa_test_tsuru_abcd123 -N ""
+	tsuru key-add test_tsuru_abcd123 ~/.id_rsa_test_tsuru_abcd123.pub
+	tsuru app-remove -a dashboard-abcd123 -y || echo ok
+	tsuru app-create dashboard-abcd123 python
+	git clone https://github.com/tsuru/tsuru-dashboard.git /tmp/tsuru-dashboard-abcd123 || echo ok
+	eval $(ssh-agent)
+	ssh-add ~/.id_rsa_test_tsuru_abcd123
+	cd /tmp/tsuru-dashboard-abcd123 && git push ssh://git@${tsuru_admin_ip}:2222/dashboard-abcd123.git
+	curl -sL dashboard-abcd123.${tsuru_admin_ip}.nip.io | grep -q  "tsuru web dashboard"
