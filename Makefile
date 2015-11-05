@@ -71,7 +71,13 @@ start-docker-no-tls:
 		|| echo docker-no-tls is running
 
 consul-keys:
-	@terraform apply -var consul_ip=$$(docker-machine ip docker-tsuru-admin)
+	$(eval tsuru_admin_ip=$(shell docker-machine ip docker-tsuru-admin))
+	@echo Settings consul key tsuru/git/rw-host
+	@curl -X PUT -d "${tsuru_admin_ip}:2222" http://${tsuru_admin_ip}:8500/v1/kv/tsuru/git/rw-host
+	@echo
+	@echo Settings consul key hipache/domain
+	@curl -X PUT -d "${tsuru_admin_ip}.nip.io" http://${tsuru_admin_ip}:8500/v1/kv/hipache/domain
+	@echo
 
 test:
 	$(eval tsuru_admin_ip=$(shell docker-machine ip docker-tsuru-admin))
