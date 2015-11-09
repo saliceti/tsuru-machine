@@ -6,7 +6,7 @@ registrator:
     environment:
         SERVICE_NAME: registrator
     restart: always
-    command: -ip TSURU_ADMIN_IP -resync 5 consul://CONSUL_IP:8500
+    command: -ip TSURU_SERVER_IP -resync 5 consul://CONSUL_IP:8500
 
 consul-template:
     container_name: consul-template
@@ -20,7 +20,7 @@ consul-template:
     environment:
         SERVICE_NAME: consul-template
     restart: always
-    command: -consul "CONSUL_IP:8500" -log-level info
+    command: -consul CONSUL_IP:8500 -log-level info
 
 mongo:
     container_name: mongo
