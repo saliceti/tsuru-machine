@@ -55,7 +55,7 @@ set-dns-tsuru-server-machine: start-tsuru-server-machine
 		"sudo sh -c 'echo -e \"nameserver ${CONSUL_IP}\nsearch service.consul\nnameserver 192.168.0.1\nnameserver 0.0.0.0\" > /etc/resolv.conf'"
 	@docker-machine ssh tsuru-server \
 		"sudo sh -c 'sed \"s/--dns=192.168.*$\/--dns=${CONSUL_IP}/\" -i /var/lib/boot2docker/profile'"
-	@docker-machine ssh runner \
+	@docker-machine ssh tsuru-server \
 		"sudo sh -c 'sudo /etc/init.d/docker restart'"
 
 deploy-consul: start-consul-machine compose-up-consul
