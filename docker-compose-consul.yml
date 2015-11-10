@@ -15,7 +15,7 @@ consul:
     environment:
         SERVICE_NAME: consul
     restart: always
-    command: -server -advertise CONSUL_IP -bootstrap -data-dir=/data/consul
+    command: -server -advertise ${CONSUL_IP} -bootstrap -data-dir=/data/consul
 
 registrator:
     container_name: registrator
@@ -25,4 +25,4 @@ registrator:
     environment:
         SERVICE_NAME: registrator
     restart: always
-    command: -ip CONSUL_IP -resync 5 consul://CONSUL_IP:8500
+    command: -ip ${CONSUL_IP} -resync 5 consul://${CONSUL_IP}:8500

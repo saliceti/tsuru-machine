@@ -87,33 +87,25 @@ build-images: check-var-dockerized-setup
 		&& cd ${DOCKERIZED_SETUP_DIR}/consul-template && docker build -t consul-template . \
 		&& cd ${DOCKERIZED_SETUP_DIR}/router-hipache && docker build -t router-hipache .
 
-render-compose-yaml-consul:
-	@sed "s/CONSUL_IP/$$(docker-machine ip consul)/g" docker-compose-consul.yml.tpl > docker-compose-consul.yml
-
-render-compose-yaml:
-	@sed -e "s/CONSUL_IP/$$(docker-machine ip consul)/g" \
-		-e "s/TSURU_SERVER_IP/$$(docker-machine ip tsuru-server)/g" \
-		docker-compose.yml.tpl \
-		> docker-compose.yml
-
-render-compose-yaml-dev:
-	@sed -e "s/CONSUL_IP/$$(docker-machine ip consul)/g" \
-		-e "s/TSURU_SERVER_IP/$$(docker-machine ip tsuru-server)/g" \
-		-e "s@image: tsuru/@image: @g" \
-		docker-compose.yml.tpl \
-		> docker-compose.yml
-
-compose-up-consul: render-compose-yaml-consul
+compose-up-consul:
 	@eval "$$(docker-machine env consul)" \
-		&& COMPOSE_FILE=docker-compose-consul.yml docker-compose up -d
+		&& COMPOSE_FILE=docker-compose-consul.yml \
+		CONSUL_IP=$$(docker-machine ip consul) \
+		docker-compose up -d
 
-compose-up: render-compose-yaml
+compose-up:
 	@eval "$$(docker-machine env tsuru-server)" \
-		&& docker-compose up -d
+		&& CONSUL_IP=$$(docker-machine ip consul) \
+		TSURU_SERVER_IP=$$(docker-machine ip tsuru-server) \
+		HUB_DIR=tsuru/ \
+		docker-compose up -d
 
-compose-up-dev: render-compose-yaml-dev
-	eval "$$(docker-machine env tsuru-server)" \
-		&& docker-compose up -d
+compose-up-dev:
+	@eval "$$(docker-machine env tsuru-server)" \
+		&& CONSUL_IP=$$(docker-machine ip consul) \
+		TSURU_SERVER_IP=$$(docker-machine ip tsuru-server) \
+		HUB_DIR= \
+		docker-compose up -d
 
 consul-keys:
 	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
