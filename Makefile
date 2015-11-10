@@ -44,6 +44,8 @@ set-dns-runner-machine: start-runner-machine
 		"sudo sh -c 'grep -q \"${TSURU_SERVER_IP} registry.service.consul\" /etc/hosts || echo -e \"${TSURU_SERVER_IP} registry.service.consul\" >> /etc/hosts'"
 	@docker-machine ssh runner \
 		"sudo sh -c 'grep -q \"${TSURU_SERVER_IP} tsuru-api.service.consul\" /etc/hosts || echo -e \"${TSURU_SERVER_IP} tsuru-api.service.consul\" >> /etc/hosts'"
+	docker-machine ssh runner \
+		"sudo sh -c 'sed \"s/--dns=192.168.*$\/--dns=${CONSUL_IP}/\" -i /var/lib/boot2docker/profile'"
 	@docker-machine ssh runner \
 		"sudo sh -c 'sudo /etc/init.d/docker restart'"
 
@@ -51,6 +53,10 @@ set-dns-tsuru-server-machine: start-tsuru-server-machine
 	$(eval CONSUL_IP=$(shell docker-machine ip consul))
 	@docker-machine ssh tsuru-server \
 		"sudo sh -c 'echo -e \"nameserver ${CONSUL_IP}\nsearch service.consul\nnameserver 192.168.0.1\nnameserver 0.0.0.0\" > /etc/resolv.conf'"
+	@docker-machine ssh tsuru-server \
+		"sudo sh -c 'sed \"s/--dns=192.168.*$\/--dns=${CONSUL_IP}/\" -i /var/lib/boot2docker/profile'"
+	@docker-machine ssh runner \
+		"sudo sh -c 'sudo /etc/init.d/docker restart'"
 
 deploy-consul: start-consul-machine compose-up-consul
 deploy-tsuru-server: start-tsuru-server-machine compose-up
