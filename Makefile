@@ -93,14 +93,16 @@ render-compose-yaml-consul:
 	@sed "s/CONSUL_IP/$$(docker-machine ip consul)/g" docker-compose-consul.yml.tpl > docker-compose-consul.yml
 
 render-compose-yaml:
-	@sed "s/CONSUL_IP/$$(docker-machine ip consul)/g" docker-compose.yml.tpl \
+	@sed -e "s/CONSUL_IP/$$(docker-machine ip consul)/g" \
 		-e "s/TSURU_SERVER_IP/$$(docker-machine ip tsuru-server)/g" \
+		docker-compose.yml.tpl \
 		> docker-compose.yml
 
 render-compose-yaml-dev:
 	@sed -e "s/CONSUL_IP/$$(docker-machine ip consul)/g" \
 		-e "s/TSURU_SERVER_IP/$$(docker-machine ip tsuru-server)/g" \
-		-e "s@image: tsuru/@image: @g" docker-compose.yml.tpl \
+		-e "s@image: tsuru/@image: @g" \
+		docker-compose.yml.tpl \
 		> docker-compose.yml
 
 compose-up-consul: render-compose-yaml-consul
