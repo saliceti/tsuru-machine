@@ -17,7 +17,6 @@ create-tsuru-server-machine:
 	$(eval CONSUL_IP=$(shell docker-machine ip consul))
 	@docker-machine create \
 	    --engine-opt dns=${CONSUL_IP} \
-	    --engine-opt dns=8.8.8.8 \
 	    --engine-opt dns-search=service.consul \
 	    --engine-opt tlsverify=false \
 	    -d virtualbox tsuru-server \
@@ -27,7 +26,6 @@ create-runner-machine:
 	$(eval CONSUL_IP=$(shell docker-machine ip consul))
 	@docker-machine create \
 		--engine-opt dns=${CONSUL_IP} \
-		--engine-opt dns=8.8.8.8 \
 		--engine-opt dns-search=service.consul \
 		--engine-opt host=tcp://0.0.0.0:2375 \
 		--engine-env DOCKER_TLS=no \
