@@ -15,7 +15,7 @@ consul:
     environment:
         SERVICE_NAME: consul
     restart: always
-    command: -server -advertise CONSUL_IP -bootstrap
+    command: -server -advertise CONSUL_IP -bootstrap -data-dir=/data/consul
 
 registrator:
     container_name: registrator
