@@ -37,8 +37,15 @@ create-runner-machine:
 
 set-dns-runner-machine: start-runner-machine
 	$(eval CONSUL_IP=$(shell docker-machine ip consul))
+	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
 	@docker-machine ssh runner \
 		"sudo sh -c 'echo -e \"nameserver ${CONSUL_IP}\nsearch service.consul\nnameserver 192.168.0.1\nnameserver 0.0.0.0\" > /etc/resolv.conf'"
+	@docker-machine ssh runner \
+		"sudo sh -c 'grep -q \"${TSURU_SERVER_IP} registry.service.consul\" /etc/hosts || echo -e \"${TSURU_SERVER_IP} registry.service.consul\" >> /etc/hosts'"
+	@docker-machine ssh runner \
+		"sudo sh -c 'grep -q \"${TSURU_SERVER_IP} tsuru-api.service.consul\" /etc/hosts || echo -e \"${TSURU_SERVER_IP} tsuru-api.service.consul\" >> /etc/hosts'"
+	@docker-machine ssh runner \
+		"sudo sh -c 'sudo /etc/init.d/docker restart'"
 
 set-dns-tsuru-server-machine: start-tsuru-server-machine
 	$(eval CONSUL_IP=$(shell docker-machine ip consul))
