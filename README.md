@@ -6,7 +6,6 @@ Run a [Tsuru](http://tsuru.io/) server environment locally using [docker-machine
 * [Docker toolbox](https://www.docker.com/docker-toolbox)
 * [VirtualBox](https://www.virtualbox.org)
 * [Tsuru clients](http://docs.tsuru.io/en/stable/using/install-client.html)
-* [Terraform](https://terraform.io)
 
 ## Official release
 This will install 2 docker daemons:
