@@ -151,3 +151,4 @@ test:
 	ssh-add ~/.id_rsa_test_tsuru_abcd123
 	cd /tmp/tsuru-dashboard-abcd123 && git push ssh://git@${TSURU_SERVER_IP}:2222/dashboard-abcd123.git
 	curl -sL dashboard-abcd123.${TSURU_SERVER_IP}.nip.io | grep -q  "tsuru web dashboard"
+	ssh-add -d ~/.id_rsa_test_tsuru_abcd123
