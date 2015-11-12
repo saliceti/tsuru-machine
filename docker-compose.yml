@@ -10,7 +10,7 @@ registrator:
 
 consul-template:
     container_name: consul-template
-    image: ${HUB_DIR}consul-template
+    image: ${HUB_DIR}/consul-template
     volumes:
     - /var/run/docker.sock:/tmp/docker.sock
     - /data/tsuru:/data/tsuru
@@ -58,7 +58,7 @@ router-hipache:
     - "80:8080"
     volumes:
     - /data/router:/data/router
-    image: ${HUB_DIR}router-hipache
+    image: ${HUB_DIR}/router-hipache
 
 tsuru-api:
     container_name: tsuru-api
@@ -69,7 +69,7 @@ tsuru-api:
     - "8000:8000"
     volumes:
     - /data/tsuru:/data/tsuru
-    image: ${HUB_DIR}tsuru-api
+    image: ${HUB_DIR}/tsuru-api
     command: api --config=/data/tsuru/tsuru.conf
 
 archive-server:
@@ -83,7 +83,7 @@ archive-server:
     volumes:
     - /data/archive-server:/data/archive-server
     - /data/gandalf:/data/gandalf
-    image: ${HUB_DIR}archive-server
+    image: ${HUB_DIR}/archive-server
 
 gandalf:
     container_name: gandalf
@@ -97,4 +97,4 @@ gandalf:
     - /data/gandalf:/data/gandalf
     - /data/tsuru:/data/tsuru
     - /var/run/docker.sock:/tmp/docker.sock
-    image: ${HUB_DIR}gandalf
+    image: ${HUB_DIR}/gandalf

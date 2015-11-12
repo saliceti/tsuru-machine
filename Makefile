@@ -81,11 +81,11 @@ check-var-dockerized-setup:
 
 build-images: check-var-dockerized-setup
 	@eval "$$(docker-machine env tsuru-server)" \
-		&& cd ${DOCKERIZED_SETUP_DIR}/tsuru-api && docker build -t tsuru-api . \
-		&& cd ${DOCKERIZED_SETUP_DIR}/gandalf && docker build -t gandalf . \
-		&& cd ${DOCKERIZED_SETUP_DIR}/archive-server && docker build -t archive-server . \
-		&& cd ${DOCKERIZED_SETUP_DIR}/consul-template && docker build -t consul-template . \
-		&& cd ${DOCKERIZED_SETUP_DIR}/router-hipache && docker build -t router-hipache .
+		&& cd ${DOCKERIZED_SETUP_DIR}/tsuru-api && docker build -t local/tsuru-api . \
+		&& cd ${DOCKERIZED_SETUP_DIR}/gandalf && docker build -t local/gandalf . \
+		&& cd ${DOCKERIZED_SETUP_DIR}/archive-server && docker build -t local/archive-server . \
+		&& cd ${DOCKERIZED_SETUP_DIR}/consul-template && docker build -t local/consul-template . \
+		&& cd ${DOCKERIZED_SETUP_DIR}/router-hipache && docker build -t local/router-hipache .
 
 compose-up-consul:
 	@eval "$$(docker-machine env consul)" \
@@ -97,14 +97,14 @@ compose-up:
 	@eval "$$(docker-machine env tsuru-server)" \
 		&& CONSUL_IP=$$(docker-machine ip consul) \
 		TSURU_SERVER_IP=$$(docker-machine ip tsuru-server) \
-		HUB_DIR=tsuru/ \
+		HUB_DIR=tsuru \
 		docker-compose up -d
 
 compose-up-dev:
 	@eval "$$(docker-machine env tsuru-server)" \
 		&& CONSUL_IP=$$(docker-machine ip consul) \
 		TSURU_SERVER_IP=$$(docker-machine ip tsuru-server) \
-		HUB_DIR= \
+		HUB_DIR=local \
 		docker-compose up -d
 
 consul-keys:
