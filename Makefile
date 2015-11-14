@@ -126,12 +126,12 @@ rm-tsuru-server-machine:
 rm-runner-machine:
 	@docker-machine rm runner || true
 
-test: set-target setup-user setup-runner add-python-platform add-key deploy-dashboard remove-key
-set-target:
+test: target-add user-setup runner-setup platform-add-python key-add deploy-tsuru-test key-remove
+target-add:
 	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
 	tsuru target-remove machine-${TSURU_SERVER_IP}
 	tsuru target-add -s machine-${TSURU_SERVER_IP} http://${TSURU_SERVER_IP}:8000
-setup-user:
+user-setup:
 	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
 	curl -d "{\"email\":\"clark@dailyplanet.com\",\"password\":\"superman\"}" http://${TSURU_SERVER_IP}:8000/users
 	ruby login.rb ${TSURU_SERVER_IP}:8000 clark@dailyplanet.com superman
@@ -139,11 +139,11 @@ setup-user:
 	tsuru-admin pool-add default || true
 	tsuru-admin pool-teams-add default admin || true
 	tsuru key-remove test_tsuru_abcd123 -y || true
-setup-runner:
+runner-setup:
 	$(eval tsuru_docker_ip=$(shell docker-machine ip runner))
 	tsuru-admin docker-node-add --register address=http://${tsuru_docker_ip}:2375 pool=default
 	until tsuru-admin docker-node-list | grep -q ready; do echo Waiting for docker node...; sleep 5; done
-add-python-platform:
+platform-add-python:
 	tsuru-admin platform-add python --dockerfile https://raw.githubusercontent.com/tsuru/basebuilder/master/python/Dockerfile || true
 deploy-tsuru-test:
 	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
@@ -162,13 +162,13 @@ deploy-dashboard:
 	git clone https://github.com/tsuru/tsuru-dashboard.git /tmp/tsuru-dashboard-abcd123 || true
 	cd /tmp/tsuru-dashboard-abcd123 && git push ssh://git@${TSURU_SERVER_IP}:2222/dashboard-abcd123.git
 	curl -sL dashboard-abcd123.${TSURU_SERVER_IP}.nip.io | grep -q  "tsuru web dashboard"
-add-key:
+key-add:
 	rm -f ~/.id_rsa_test_tsuru_abcd123
 	ssh-keygen -f ~/.id_rsa_test_tsuru_abcd123 -N ""
 	tsuru key-add test_tsuru_abcd123 ~/.id_rsa_test_tsuru_abcd123.pub
 	eval $(ssh-agent)
 	ssh-add ~/.id_rsa_test_tsuru_abcd123
-remove-key:
+key-remove:
 	tsuru key-remove -y test_tsuru_abcd123
 	ssh-add -d ~/.id_rsa_test_tsuru_abcd123
 	rm -f ~/.id_rsa_test_tsuru_abcd123
