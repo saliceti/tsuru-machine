@@ -145,6 +145,15 @@ setup-runner:
 	until tsuru-admin docker-node-list | grep -q ready; do echo Waiting for docker node...; sleep 5; done
 add-python-platform:
 	tsuru-admin platform-add python --dockerfile https://raw.githubusercontent.com/tsuru/basebuilder/master/python/Dockerfile || true
+deploy-tsuru-test:
+	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
+	tsuru app-remove -a tsuru-test-abcd123 -y || true
+	tsuru app-create tsuru-test-abcd123 python
+	rm -rf /tmp/tsuru-test-abcd123
+	git clone https://github.com/saliceti/tsuru-test.git /tmp/tsuru-test-abcd123 || true
+	cd /tmp/tsuru-test-abcd123 && git push ssh://git@${TSURU_SERVER_IP}:2222/tsuru-test-abcd123.git
+	$(eval TIMESTAMP=$(shell date '+%s'))
+	curl -sL tsuru-test-abcd123.${TSURU_SERVER_IP}.nip.io/print?string=${TIMESTAMP} | grep -q ${TIMESTAMP}
 deploy-dashboard:
 	$(eval TSURU_SERVER_IP=$(shell docker-machine ip tsuru-server))
 	tsuru app-remove -a dashboard-abcd123 -y || true
